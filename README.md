@@ -262,4 +262,7 @@
     ```
 [Source 17-18](https://www.digitalocean.com/community/tutorials/how-to-deploy-a-flask-application-on-an-ubuntu-vps)
 
-19. Run sudo python itemcatalog.py
+19. Run
+    ```python
+    sudo python itemcatalog.py
+    ```
