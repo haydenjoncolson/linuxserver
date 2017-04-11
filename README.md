@@ -152,6 +152,18 @@
         host    all             all             ::1/128                 md5
         ```
       [Source](https://www.digitalocean.com/community/tutorials/how-to-secure-postgresql-on-an-ubuntu-vps)
+    * Enable mod_wsgi and create catalog flask app
+    ```bash
+    sudo a2enmod wsgi
+    sudo mkdir catalog
+    cd catalog
+    sudo mkdir catalog
+    cd catalog
+    sudo apt-get install python-pip
+    sudo pip install virtualenv
+    sudo virtualenv venv
+    source venv/bin/activate
+    ```
 
 10. Configure Postgreql Database
     * Create user for catalog
@@ -202,4 +214,51 @@
     engine = create_engine('postgresql://catalog:catalog@34.203.129.144/catalog')
     ```
 
-17. Run sudo python itemcatalog.py
+17. Configure virtual host
+    ```bash
+    sudo nano /etc/apache2/sites-available/catalog.conf
+    ```
+    ```bash
+    <VirtualHost *:80>
+		ServerName Public-IP
+		ServerAdmin admin@Public-IP
+		WSGIScriptAlias / /var/www/catalog/catalog.wsgi
+		<Directory /var/www/catalog/catalog/>
+			Order allow,deny
+			Allow from all
+		</Directory>
+		Alias /static /var/www/catalog/catalog/static
+		<Directory /var/www/catalog/catalog/static/>
+			Order allow,deny
+			Allow from all
+		</Directory>
+		ErrorLog ${APACHE_LOG_DIR}/error.log
+		LogLevel warn
+		CustomLog ${APACHE_LOG_DIR}/access.log combined
+    </VirtualHost>
+    ```
+    * enable site
+    ```bash
+    sudo a2ensite catalog
+    ```
+18. Create the wsgi file
+    ```python
+    #!/usr/bin/python
+    import sys
+    import logging
+    logging.basicConfig(stream=sys.stderr)
+    sys.path.insert(0, "/var/www/catalog")
+
+    from catalog import app as application
+    from catalog.database_setup import setup_db
+    from caatalog.items import populate
+    application.secret_key = 'super_secret_key'  
+
+    application.config['DATABASE_URL'] = 'postgresql://catalog:catalog@34.203.129.1$
+
+    # Create database and populate it, if not already done so.
+    setup_db(application.config['DATABASE_URL'])
+    populate()
+    ```
+
+19. Run sudo python itemcatalog.py
