@@ -250,19 +250,21 @@
     sys.path.insert(0, "/var/www/catalog")
 
     from catalog import app as application
-    from catalog.database_setup import setup_db
-    from caatalog.items import populate
     application.secret_key = 'super_secret_key'  
 
-    application.config['DATABASE_URL'] = 'postgresql://catalog:catalog@34.203.129.1$
-
-    # Create database and populate it, if not already done so.
-    setup_db(application.config['DATABASE_URL'])
-    populate()
+    application.config['DATABASE_URL'] = 'postgresql://catalog:catalog@localhost/catalog
     ```
 [Source 17-18](https://www.digitalocean.com/community/tutorials/how-to-deploy-a-flask-application-on-an-ubuntu-vps)
 
-19. Run
+19. Change itemcatalog.py to __init__.py
+    ```bash
+    sudo mv itemcatalog.py __init__.py
+    ```
+
+20. Run
     ```python
+    sudo python database_setup.py
+    sudo python items.py
     sudo python itemcatalog.py
+    sudo service apache2 restart
     ```
